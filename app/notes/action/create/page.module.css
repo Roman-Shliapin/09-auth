@@ -1,0 +1,26 @@
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 48px 0 64px;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(13, 110, 253, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02), transparent 35%);
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: 0px auto;
+  padding: 0 16px 16px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+

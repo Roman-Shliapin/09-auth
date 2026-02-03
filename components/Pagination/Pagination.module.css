@@ -1,0 +1,77 @@
+.pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pagination a,
+.pagination button {
+  cursor: pointer;
+  user-select: none;
+}
+
+.pageLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.6rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 14px;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 120ms ease;
+}
+
+.pageLink:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.38);
+  color: rgba(0, 0, 0, 0.92);
+  transform: translateY(-1px);
+}
+
+.pageLink:focus-visible {
+  outline: 2px solid rgba(13, 110, 253, 0.5);
+  outline-offset: 2px;
+}
+
+.active {
+}
+
+.disabled {
+}
+
+.activeLink {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  transform: none;
+}
+
+.activeLink:hover {
+  background: #111;
+  border-color: #111;
+  transform: none;
+}
+
+.disabledLink {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.disabledLink:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.2);
+}

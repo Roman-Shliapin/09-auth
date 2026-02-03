@@ -1,0 +1,74 @@
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 48px 0 64px;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(13, 110, 253, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02), transparent 35%);
+}
+
+.container {
+  width: 90%;
+  max-width: 1280px;
+  margin: 0px auto;
+  padding: 0 16px 16px;
+  animation: pageEnter 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 60px;
+  text-align: center;
+  animation: textDrop 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: 60ms;
+}
+
+.description {
+  font-size: 18px;
+  color: #444444;
+  line-height: 28px;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: textDrop 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.description:nth-of-type(2) {
+  animation-delay: 140ms;
+}
+
+.description:nth-of-type(3) {
+  animation-delay: 220ms;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes textDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .title,
+  .description {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
