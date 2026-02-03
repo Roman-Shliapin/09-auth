@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Environment variables
+
+Create a `.env` file in the project root (it's ignored by Git) and add:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+For convenience, you can copy it from `env.example`.
+
 First, run the development server:
 
 ```bash
