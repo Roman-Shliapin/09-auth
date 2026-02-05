@@ -8,12 +8,8 @@ function isHttpRequest(req: NextRequest) {
 }
 
 function rewriteSetCookieForProxy(req: NextRequest, setCookie: string) {
-  // Remove Domain attribute so cookies are scoped to the current host (our Next.js app),
-  // not to notehub-api.goit.study.
   let rewritten = setCookie.replace(/;\s*Domain=[^;]+/gi, '');
 
-  // Local dev is usually http://localhost:3000; Secure cookies won't be set over HTTP.
-  // If backend uses SameSite=None; Secure, rewrite to Lax for HTTP.
   if (isHttpRequest(req)) {
     rewritten = rewritten.replace(/;\s*Secure/gi, '');
     rewritten = rewritten.replace(/;\s*SameSite=None/gi, '; SameSite=Lax');
@@ -86,7 +82,6 @@ export async function proxyToBackend(req: NextRequest, backendPathWithQuery: str
 }
 
 export function extractCookieValue(setCookieHeader: string, cookieName: string) {
-  // Matches: "accessToken=...; Path=/; HttpOnly"
   const match = setCookieHeader.match(new RegExp(`(?:^|,\\s*)${cookieName}=([^;]+)`));
   return match?.[1];
 }

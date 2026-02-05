@@ -10,14 +10,12 @@ function isAuthRoute(pathname: string) {
 }
 
 function isProbablyAuthenticated(req: NextRequest) {
-  // Backend uses cookies: accessToken + refreshToken
-  return Boolean(req.cookies.get('accessToken')?.value || req.cookies.get('refreshToken')?.value);
+  return Boolean(req.cookies.get('accessToken')?.value);
 }
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Ignore Next internals and API routes
   if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname === '/favicon.ico') {
     return NextResponse.next();
   }

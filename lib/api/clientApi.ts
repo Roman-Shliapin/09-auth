@@ -68,7 +68,6 @@ export async function logout(): Promise<void> {
 
 export async function checkSession(): Promise<User | null> {
   const res = await api.get<User | ''>('/auth/session', {
-    // Homework contract: 200 with empty body is valid for "not authorized"
     validateStatus: (status) => (status >= 200 && status < 300) || status === 200,
   });
 

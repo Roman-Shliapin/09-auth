@@ -30,14 +30,11 @@ export default function AuthProvider({ children }: Props) {
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
-    // Non-blocking bootstrap: helps render correct header state on public pages too.
-    // We don't show a loader here to avoid flashing the whole UI.
     checkSession()
       .then((user) => {
         if (user) setUser(user);
       })
       .catch(() => {
-        // ignore
       });
   }, [setUser]);
 
@@ -57,12 +54,10 @@ export default function AuthProvider({ children }: Props) {
           return;
         }
 
-        // Not authorized on a private route → logout + redirect to login
         clearIsAuthenticated();
         try {
           await logout();
         } catch {
-          // ignore
         }
         router.replace('/sign-in');
       } finally {
