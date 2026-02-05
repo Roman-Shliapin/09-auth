@@ -6,6 +6,23 @@ const BACKEND_BASE_URL = 'https://notehub-api.goit.study';
 export async function GET(req: NextRequest) {
   const cookieHeader = req.headers.get('cookie') ?? '';
 
+  const meRes = await fetch(`${BACKEND_BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      cookie: cookieHeader,
+      Accept: 'application/json',
+    },
+    redirect: 'manual',
+  });
+
+  if (meRes.ok) {
+    const userJson = await meRes.text();
+    return new NextResponse(userJson || null, {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   const sessionRes = await fetch(`${BACKEND_BASE_URL}/auth/session`, {
     method: 'GET',
     headers: {
@@ -31,7 +48,7 @@ export async function GET(req: NextRequest) {
         ? `${cookieHeader}${cookieHeader ? '; ' : ''}accessToken=${nextAccessToken}`
         : cookieHeader;
 
-  const meRes = await fetch(`${BACKEND_BASE_URL}/users/me`, {
+  const refreshedMeRes = await fetch(`${BACKEND_BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
       cookie: cookieForMe,
@@ -40,11 +57,11 @@ export async function GET(req: NextRequest) {
     redirect: 'manual',
   });
 
-  if (!meRes.ok) {
+  if (!refreshedMeRes.ok) {
     return new NextResponse(null, { status: 200 });
   }
 
-  const userJson = await meRes.text();
+  const userJson = await refreshedMeRes.text();
   const res = new NextResponse(userJson || null, {
     status: 200,
     headers: { 'content-type': 'application/json' },
