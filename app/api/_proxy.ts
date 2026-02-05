@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const BACKEND_BASE_URL = 'https://notehub-api.goit.study';
+import { BACKEND_BASE_URL } from './api';
 
 function isHttpRequest(req: NextRequest) {
   const proto = req.headers.get('x-forwarded-proto') ?? req.nextUrl.protocol.replace(':', '');

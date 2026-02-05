@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_BASE_URL } from '../../api';
 import { appendUpstreamSetCookies, extractCookieValue } from '../../_proxy';
-
-const BACKEND_BASE_URL = 'https://notehub-api.goit.study';
 
 export async function GET(req: NextRequest) {
   const cookieHeader = req.headers.get('cookie') ?? '';
