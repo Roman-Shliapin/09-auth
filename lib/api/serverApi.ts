@@ -1,7 +1,7 @@
+import axios from 'axios';
 import type { Note, NoteTag } from '@/types/note';
 import type { User } from '@/types/user';
-import { cookies } from 'next/headers';
-import { api } from './api';
+import { cookies, headers } from 'next/headers';
 
 export interface FetchNotesProps {
   page?: number;
@@ -20,8 +20,22 @@ async function cookieHeader() {
   return store.toString();
 }
 
+async function serverBaseURL() {
+  const h = await headers();
+  const proto = h.get('x-forwarded-proto') ?? 'http';
+  const host = h.get('x-forwarded-host') ?? h.get('host');
+  if (!host) return `${process.env.NEXT_PUBLIC_API_URL}/api`;
+  return `${proto}://${host}/api`;
+}
+
+async function serverApi() {
+  const baseURL = await serverBaseURL();
+  return axios.create({ baseURL, withCredentials: true });
+}
+
 export async function fetchNotes(params?: FetchNotesProps): Promise<FetchNotesResponse> {
   const cookie = await cookieHeader();
+  const api = await serverApi();
   const res = await api.get<FetchNotesResponse>('/notes', {
     params: {
       page: params?.page ?? 1,
@@ -36,6 +50,7 @@ export async function fetchNotes(params?: FetchNotesProps): Promise<FetchNotesRe
 
 export async function fetchNoteById(id: string): Promise<Note> {
   const cookie = await cookieHeader();
+  const api = await serverApi();
   const res = await api.get<Note>(`/notes/${id}`, {
     headers: cookie ? { Cookie: cookie } : undefined,
   });
@@ -44,6 +59,7 @@ export async function fetchNoteById(id: string): Promise<Note> {
 
 export async function getMe(): Promise<User> {
   const cookie = await cookieHeader();
+  const api = await serverApi();
   const res = await api.get<User>('/users/me', {
     headers: cookie ? { Cookie: cookie } : undefined,
   });
@@ -52,6 +68,7 @@ export async function getMe(): Promise<User> {
 
 export async function checkSession(): Promise<User | null> {
   const cookie = await cookieHeader();
+  const api = await serverApi();
   const res = await api.get<User | ''>('/auth/session', {
     headers: cookie ? { Cookie: cookie } : undefined,
     validateStatus: (status) => (status >= 200 && status < 300) || status === 200,
