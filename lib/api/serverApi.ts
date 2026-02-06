@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import type { Note, NoteTag } from '@/types/note';
 import type { User } from '@/types/user';
 import { cookies, headers } from 'next/headers';
@@ -66,17 +66,12 @@ export async function getMe(): Promise<User> {
   return res.data;
 }
 
-export async function checkSession(): Promise<User | null> {
+export async function checkSession(): Promise<AxiosResponse<{ success: boolean }>> {
   const cookie = await cookieHeader();
   const api = await serverApi();
-  const res = await api.get<User | ''>('/auth/session', {
+  return await api.get<{ success: boolean }>('/auth/session', {
     headers: cookie ? { Cookie: cookie } : undefined,
-    validateStatus: (status) => (status >= 200 && status < 300) || status === 200,
   });
-
-  if (!res.data) return null;
-  if (typeof res.data === 'string') return null;
-  return res.data;
 }
 
 

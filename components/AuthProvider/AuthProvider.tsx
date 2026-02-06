@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import Loading from '@/components/Loading/Loading';
-import { checkSession, logout } from '@/lib/api/clientApi';
+import { checkSession, getMe, logout } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 
 type Props = {
@@ -31,8 +31,10 @@ export default function AuthProvider({ children }: Props) {
 
   useEffect(() => {
     checkSession()
-      .then((user) => {
-        if (user) setUser(user);
+      .then(async (success) => {
+        if (!success) return;
+        const me = await getMe();
+        setUser(me);
       })
       .catch(() => {
       });
@@ -46,11 +48,13 @@ export default function AuthProvider({ children }: Props) {
 
       setIsChecking(true);
       try {
-        const user = await checkSession();
+        const success = await checkSession();
         if (!isMounted) return;
 
-        if (user) {
-          setUser(user);
+        if (success) {
+          const me = await getMe();
+          if (!isMounted) return;
+          setUser(me);
           return;
         }
 

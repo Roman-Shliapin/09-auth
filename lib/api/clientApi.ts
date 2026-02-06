@@ -66,14 +66,13 @@ export async function logout(): Promise<void> {
   await api.post('/auth/logout');
 }
 
-export async function checkSession(): Promise<User | null> {
-  const res = await api.get<User | ''>('/auth/session', {
-    validateStatus: (status) => (status >= 200 && status < 300) || status === 200,
-  });
+type CheckSessionResponse = {
+  success: boolean;
+};
 
-  if (!res.data) return null;
-  if (typeof res.data === 'string') return null;
-  return res.data;
+export async function checkSession(): Promise<boolean> {
+  const res = await api.get<CheckSessionResponse>('/auth/session');
+  return Boolean(res.data?.success);
 }
 
 export async function getMe(): Promise<User> {

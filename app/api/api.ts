@@ -1,3 +1,7 @@
-export const BACKEND_BASE_URL = 'https://notehub-api.goit.study';
+import axios from 'axios';
 
+export const api = axios.create({
+ baseURL: 'https://notehub-api.goit.study',
+ withCredentials: true,
+});
 

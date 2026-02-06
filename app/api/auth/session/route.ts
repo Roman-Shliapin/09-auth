@@ -1,73 +1,55 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { BACKEND_BASE_URL } from '../../api';
-import { appendUpstreamSetCookies, extractCookieValue } from '../../_proxy';
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { api } from "../../api";
+import { parse } from "cookie";
+import { isAxiosError } from "axios";
+import { logErrorResponse } from "../../_utils/utils";
 
-export async function GET(req: NextRequest) {
-  const cookieHeader = req.headers.get('cookie') ?? '';
+export async function GET() {
+ try {
+ const cookieStore = await cookies();
+ const accessToken = cookieStore.get("accessToken")?.value;
+ const refreshToken = cookieStore.get("refreshToken")?.value;
 
-  const meRes = await fetch(`${BACKEND_BASE_URL}/users/me`, {
-    method: 'GET',
-    headers: {
-      cookie: cookieHeader,
-      Accept: 'application/json',
-    },
-    redirect: 'manual',
-  });
+ if (accessToken) {
+ return NextResponse.json({ success: true });
+ }
 
-  if (meRes.ok) {
-    const userJson = await meRes.text();
-    return new NextResponse(userJson || null, {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-    });
-  }
+ if (refreshToken) {
+ const apiRes = await api.get("auth/session", {
+ headers: {
+ Cookie: cookieStore.toString(),
+ },
+ });
 
-  const sessionRes = await fetch(`${BACKEND_BASE_URL}/auth/session`, {
-    method: 'GET',
-    headers: {
-      cookie: cookieHeader,
-      Accept: 'application/json',
-    },
-    redirect: 'manual',
-  });
+ const setCookie = apiRes.headers["set-cookie"];
 
-  if (!sessionRes.ok) {
-    return new NextResponse(null, { status: 200 });
-  }
+ if (setCookie) {
+ const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+ for (const cookieStr of cookieArray) {
+ const parsed = parse(cookieStr);
 
-  const getSetCookie = (sessionRes.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie;
-  const setCookies = typeof getSetCookie === 'function' ? getSetCookie.call(sessionRes.headers) : [];
-  const rawSetCookie = setCookies.join(', ');
-  const nextAccessToken = extractCookieValue(rawSetCookie, 'accessToken');
+ const options = {
+ expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
+ path: parsed.Path,
+ maxAge: Number(parsed["Max-Age"]),
+ };
 
-  const cookieForMe =
-    nextAccessToken && cookieHeader.includes('accessToken=')
-      ? cookieHeader.replace(/accessToken=[^;]*/i, `accessToken=${nextAccessToken}`)
-      : nextAccessToken
-        ? `${cookieHeader}${cookieHeader ? '; ' : ''}accessToken=${nextAccessToken}`
-        : cookieHeader;
-
-  const refreshedMeRes = await fetch(`${BACKEND_BASE_URL}/users/me`, {
-    method: 'GET',
-    headers: {
-      cookie: cookieForMe,
-      Accept: 'application/json',
-    },
-    redirect: 'manual',
-  });
-
-  if (!refreshedMeRes.ok) {
-    return new NextResponse(null, { status: 200 });
-  }
-
-  const userJson = await refreshedMeRes.text();
-  const res = new NextResponse(userJson || null, {
-    status: 200,
-    headers: { 'content-type': 'application/json' },
-  });
-
-  appendUpstreamSetCookies(req, res, sessionRes);
-  return res;
+ if (parsed.accessToken)
+ cookieStore.set("accessToken", parsed.accessToken, options);
+ if (parsed.refreshToken)
+ cookieStore.set("refreshToken", parsed.refreshToken, options);
+ }
+ return NextResponse.json({ success: true }, { status: 200 });
+ }
+ }
+ return NextResponse.json({ success: false }, { status: 200 });
+ } catch (error) {
+ if (isAxiosError(error)) {
+ logErrorResponse(error.response?.data);
+ return NextResponse.json({ success: false }, { status: 200 });
+ }
+ logErrorResponse({ message: (error as Error).message });
+ return NextResponse.json({ success: false }, { status: 200 });
+ }
 }
-
-

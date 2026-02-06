@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 import { getMe } from '@/lib/api/serverApi';
@@ -34,8 +35,8 @@ export default async function ProfilePage() {
             </Link>
           </div>
           <div className={css.avatarWrapper}>
-            <img
-              src={user.avatar || 'Avatar'}
+            <Image
+              src={user.avatar || 'https://ac.goit.global/fullstack/react/default-avatar.jpg'}
               alt="User Avatar"
               width={120}
               height={120}
